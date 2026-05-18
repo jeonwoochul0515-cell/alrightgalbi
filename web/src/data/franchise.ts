@@ -1,0 +1,258 @@
+import type { FranchiseCost, ValueProp, ProcessStep } from "../types/domain";
+
+// 정보공개서 2025.0854 발췌 (단위: 천원, 부가세 포함, 30평 기준 추정)
+export const franchiseCosts: FranchiseCost[] = [
+  // 최초 가맹금
+  {
+    id: "fee",
+    category: "최초가맹금",
+    label: "가맹비",
+    amount: 5500,
+    unit: "KRW_1000",
+    note: "가입비 · 영업 브랜드/지식재산권 사용 허락 · 오픈지원 · SC 지원",
+  },
+  {
+    id: "education",
+    category: "최초가맹금",
+    label: "교육비",
+    amount: 5500,
+    unit: "KRW_1000",
+    note: "매장당 1명 · 개점 전 조리·서비스·운영 교육",
+  },
+  {
+    id: "deposit",
+    category: "최초가맹금",
+    label: "보증금",
+    amount: 0,
+    unit: "KRW_1000",
+    emphasized: true,
+    note: "보증금 0원",
+  },
+  // 기타 비용
+  {
+    id: "interior",
+    category: "기타비용",
+    label: "인테리어 (30평 기준)",
+    amount: 59400,
+    unit: "KRW_1000",
+    supplier: "협력업체",
+    note: "벽면·천장·바닥·설비·전기 (철거·간판·냉난방·소방 별도)",
+  },
+  {
+    id: "sign",
+    category: "기타비용",
+    label: "간판",
+    amount: 4400,
+    unit: "KRW_1000",
+    supplier: "한국디자인",
+  },
+  {
+    id: "kitchen",
+    category: "기타비용",
+    label: "기기·기물 (화덕·숯불직화기 외)",
+    amount: 16500,
+    unit: "KRW_1000",
+    supplier: "바로주방시스템",
+  },
+  {
+    id: "hall",
+    category: "기타비용",
+    label: "홀집기류",
+    amount: 8800,
+    unit: "KRW_1000",
+    supplier: "바로주방시스템",
+  },
+  {
+    id: "promo",
+    category: "기타비용",
+    label: "홍보 디자인물",
+    amount: 2200,
+    unit: "KRW_1000",
+    supplier: "한국디자인",
+  },
+  {
+    id: "initial-stock",
+    category: "기타비용",
+    label: "초도 물품",
+    amount: 4400,
+    unit: "KRW_1000",
+    supplier: "옛찬·다드림 외",
+  },
+  // 운영 부담
+  {
+    id: "royalty",
+    category: "운영부담",
+    label: "로열티",
+    amount: 165, // 0.0165 = 1.65% (×10000으로 표시)
+    unit: "PERCENT",
+    emphasized: true,
+    displayOverride: "1.65% 또는 44만원",
+    note: "매월 매출의 1.65% 또는 매월 44만원 (부가세 포함). 지급기한 매월 5일 — 정보공개서 IV-2",
+  },
+  {
+    id: "intermediate-margin",
+    category: "운영부담",
+    label: "차액가맹금",
+    amount: 0,
+    unit: "KRW_1000",
+    displayOverride: "0원",
+    note: "본사 식자재·물품 공급 시 추가되는 도매가 대비 차액 — 2024년 가맹점당 평균 차액가맹금 0원 (정보공개서 IV-2)",
+  },
+  {
+    id: "ad-share",
+    category: "운영부담",
+    label: "광고분담금",
+    amount: 5000,
+    unit: "PERCENT",
+    displayOverride: "본사 50 / 점주 50",
+    note: "전국 통합 광고 집행 시 50:50 분담. 통지받은 날로부터 15일 이내, 광고 미집행 시 반환 — 정보공개서 IV-2",
+  },
+  {
+    id: "promo-share",
+    category: "운영부담",
+    label: "판촉분담금",
+    amount: 5000,
+    unit: "PERCENT",
+    displayOverride: "협의 단위",
+    note: "본사·가맹점 협의로 분담 단위 결정. 통지받은 날로부터 15일 이내, 미집행 시 반환. 매장 단독 판촉물은 점주 부담 — 정보공개서 IV-2",
+  },
+  {
+    id: "training-refresher",
+    category: "운영부담",
+    label: "보수교육비",
+    amount: 0,
+    unit: "KRW_1000",
+    displayOverride: "실비",
+    note: "매월 보수교육에 소요되는 실비. 통지 후 3일 이내, 교육 미실시 시 반환 — 정보공개서 IV-2",
+  },
+  {
+    id: "training-special",
+    category: "운영부담",
+    label: "특별교육비",
+    amount: 0,
+    unit: "KRW_1000",
+    displayOverride: "실비",
+    note: "수시 특별교육 발생 시 소요 실비. 통지 후 3일 이내, 교육 미실시 시 반환 — 정보공개서 IV-2",
+  },
+  {
+    id: "store-renewal",
+    category: "운영부담",
+    label: "점포환경개선비용",
+    amount: 0,
+    unit: "KRW_1000",
+    displayOverride: "분담분",
+    note: "BI/CI 변경 시 본사가 개발비용 부담. 가맹점 간판·설비 변경분은 협의하여 본사 분담 후 나머지를 점주 부담 — 정보공개서 IV-2",
+  },
+  {
+    id: "late-interest",
+    category: "운영부담",
+    label: "지연이자",
+    amount: 1200,
+    unit: "PERCENT",
+    displayOverride: "연 12%",
+    note: "로열티·분담금 지급기일 다음날부터 지급일까지의 연이자율 — 정보공개서 IV-2",
+  },
+];
+
+export const totalInitialFee = franchiseCosts
+  .filter((c) => c.category === "최초가맹금" && c.unit === "KRW_1000")
+  .reduce((sum, c) => sum + c.amount, 0);
+
+export const totalOtherCost = franchiseCosts
+  .filter((c) => c.category === "기타비용" && c.unit === "KRW_1000")
+  .reduce((sum, c) => sum + c.amount, 0);
+
+export const valueProps: ValueProp[] = [
+  {
+    id: "deposit-zero",
+    metric: "0",
+    label: "보증금",
+    description: "보증금 없이 시작하는 부산·경남·대구 한식 갈비 가맹",
+    icon: "anchor",
+    source: "정보공개서 2025.0854",
+  },
+  {
+    id: "intermediate-margin-zero",
+    metric: "0",
+    label: "차액가맹금",
+    description: "본사가 식자재·물품에서 챙기는 마진(차액가맹금) 0원. 매월 매출 지급 외 숨은 비용이 없습니다.",
+    icon: "shield",
+    source: "정보공개서 2025.0854 IV-2 · 2024년 기준 가맹점당 평균 차액가맹금 0원",
+  },
+  {
+    id: "royalty",
+    metric: "1.65",
+    label: "% 로열티",
+    description: "매월 매출의 1.65% 또는 매월 44만원 (부가세 포함)",
+    icon: "coin",
+    source: "정보공개서 2025.0854",
+  },
+  {
+    id: "saved",
+    metric: "6,030",
+    label: "만원 (5년)",
+    description: "월 매출 3,000만원 가정 시 5% 대비 매월 1,005,000원, 5년이면 6,030만원의 부담을 덜 수 있습니다",
+    icon: "leaf",
+    source: "단순 비교 산정 · 실제 매출은 가맹점주별로 다름",
+  },
+  {
+    id: "direct",
+    metric: "10",
+    label: "개 매장 운영 중",
+    description: "부산 부전·화명 + 김해 외동 직영 3 + 부산·경남·대구 가맹 7, 전국 10개 매장",
+    icon: "store",
+    source: "본사 직영·가맹 운영 기준",
+  },
+];
+
+export const processSteps: ProcessStep[] = [
+  {
+    id: "consult",
+    order: 1,
+    title: "가맹 상담",
+    durationDays: "1–3일",
+    description: "창업 상담 신청 폼 또는 본사 010-5722-4929로 직접 상담. 24시간 내 본사 회신",
+  },
+  {
+    id: "disclosure",
+    order: 2,
+    title: "정보공개서 제공",
+    durationDays: "14일 숙려",
+    description: "정보공개서 2025.0854 즉시 제공. 가맹사업법 §7③에 따라 14일 숙려기간 보장",
+  },
+  {
+    id: "site",
+    order: 3,
+    title: "입지 검토",
+    durationDays: "1–2주",
+    description: "가맹희망자 주도로 희망 영업지역 파악 · 본사 자문 · 최적 입지 도출",
+  },
+  {
+    id: "contract",
+    order: 4,
+    title: "가맹 계약",
+    durationDays: "1일",
+    description: "가맹비·교육비 신한은행 예치 · 서울보증보험 피해보상보험 가입",
+  },
+  {
+    id: "interior",
+    order: 5,
+    title: "인테리어·기기",
+    durationDays: "3–5주",
+    description: "본사 감리 인테리어 시공 · 화덕·숯불직화기 등 기기 설치",
+  },
+  {
+    id: "training",
+    order: 6,
+    title: "교육·오픈",
+    durationDays: "1–2주",
+    description: "조리·서비스·운영 교육 (매장당 1명) · 오픈 SC 지원",
+  },
+  {
+    id: "ops",
+    order: 7,
+    title: "사후 관리",
+    durationDays: "지속",
+    description: "매월 보수교육 · 광고·판촉 분담 (본사 50% / 점주 50%) · 매뉴얼 갱신",
+  },
+];

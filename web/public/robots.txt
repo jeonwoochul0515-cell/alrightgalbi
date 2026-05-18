@@ -1,0 +1,31 @@
+# 올바로갈비 robots.txt
+# https://olbarogalbi.web.app/robots.txt
+
+User-agent: Yeti
+Allow: /
+
+User-agent: Yeti-Mobile
+Allow: /
+
+User-agent: NaverBot
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Daumoa
+Allow: /
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/private/
+Disallow: /*?utm_
+
+Sitemap: https://olbarogalbi.web.app/sitemap.xml

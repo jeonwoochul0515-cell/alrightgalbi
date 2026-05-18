@@ -1,0 +1,23 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 가맹문의 — 클라이언트 직접 접근 금지
+    // 쓰기는 Functions(Admin SDK)만, 읽기는 admin custom claim 보유자만
+    match /inquiries/{id} {
+      allow read: if request.auth != null
+                  && request.auth.token.admin == true;
+      allow write: if false;
+    }
+
+    // 레이트 리미트 — 클라이언트 접근 완전 차단
+    match /rate_limits/{key} {
+      allow read, write: if false;
+    }
+
+    // 기본 차단
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

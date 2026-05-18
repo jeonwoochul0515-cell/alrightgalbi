@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+build/
+
+# Vite
+.vite/
+**/.vite/
+
+# Environment (keep .env.example committed)
+.env
+.env.local
+.env.*.local
+web/.env
+web/.env.local
+web/.env.*.local
+
+# Firebase
+.firebase/
+**/.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Output / temp
+hero-out/
+info.txt
+info_utf8.txt
+
+# Sensitive / large root binaries (커밋 제외, 로컬에만 보관)
+/정보공개서.pdf
+/KakaoTalk_*.jpg
+/이름 없는 촬영*.jpg
+/image*.png
+/갈비이미지.jpg
+# 메뉴/참고용 원본 사진 — web/public/menu/로 복사된 것만 커밋
+/*.jpg
+/*.png
+!/web/**
