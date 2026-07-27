@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { faqPageJsonLd } from "../lib/jsonld";
 import { HeroFranchiseSection } from "../components/organisms/HeroFranchiseSection";
 import { TrustBarSection } from "../components/organisms/TrustBarSection";
 import { ValuePropsSection } from "../components/organisms/ValuePropsSection";
@@ -21,7 +22,14 @@ export function FranchisePage() {
           name="description"
           content="가맹비 550만 + 교육비 550만, 보증금 0원, 매월 매출의 1.65% 또는 매월 44만원 로열티, 차액가맹금 0원. 정보공개서 2025.0854 공개. 부산 본사가 직접 상담드립니다."
         />
-        <link rel="canonical" href="https://olbarogalbi.web.app/franchise" />
+        <link rel="canonical" href="https://olbarogalbi.com/franchise" />
+        <meta property="og:url" content="https://olbarogalbi.com/franchise" />
+        <meta property="og:title" content="가맹모집 — 보증금 0원, 1,100만원으로 시작 | olbaroGALBI" />
+        <meta
+          property="og:description"
+          content="가맹비 550만 + 교육비 550만, 보증금 0원, 로열티 1.65%, 차액가맹금 0원. 정보공개서 2025.0854 공개."
+        />
+        <script type="application/ld+json">{JSON.stringify(faqPageJsonLd)}</script>
       </Helmet>
 
       <HeroFranchiseSection />

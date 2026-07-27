@@ -1,13 +1,17 @@
+// 사이트 전역 JSON-LD 그래프 단일 소스 — vite plugin이 빌드 시 index.html에 주입하고, 페이지별 스키마(FAQ·빵부스러기)도 여기서 생성한다.
 import { stores } from "../data/stores";
 import { signatureMenu } from "../data/menu";
+import { faqItems } from "../data/faq";
 
-const SITE = "https://olbarogalbi.web.app";
+export const SITE = "https://olbarogalbi.com";
 
 const restaurant = {
   "@type": "Restaurant",
   "@id": `${SITE}/#restaurant`,
   name: "올바로갈비",
   alternateName: "Olbaro Galbi",
+  description:
+    "올바로갈비는 부산에서 시작한 가성비 숯불 갈비 프랜차이즈다. 수제양념돼지갈비 100g 3,500원 단일가로 직영 3개·가맹 7개 매장을 운영하며, 보증금 0원·차액가맹금 0원·로열티 1.65% 조건으로 가맹점을 모집한다 (정보공개서 2025.0854).",
   url: SITE,
   logo: `${SITE}/og-cover.jpg`,
   image: [`${SITE}/hero-1920.jpg`],
@@ -30,36 +34,54 @@ const restaurant = {
   hasMenu: { "@id": `${SITE}/#menu` },
 };
 
-const localBusinesses = stores.map((store) => ({
-  "@type": "LocalBusiness",
-  "@id": `${SITE}/stores/${store.id}#store`,
-  name: store.name,
-  parentOrganization: { "@id": `${SITE}/#restaurant` },
-  address: {
-    "@type": "PostalAddress",
-    streetAddress: store.address.replace("부산광역시 ", "").replace(`${store.district} `, ""),
-    addressLocality: `부산광역시 ${store.district.split(" ")[0]}`,
-    addressCountry: "KR",
-  },
-  telephone: `+82-${store.phone.replace(/-/g, "").replace(/^0/, "")}`,
-  geo: {
-    "@type": "GeoCoordinates",
-    latitude: store.lat,
-    longitude: store.lng,
-  },
-  openingHoursSpecification: [
-    {
-      "@type": "OpeningHoursSpecification",
-      dayOfWeek: store.hours.closedDays
-        ? ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].filter(
-            (d) => !store.hours.closedDays?.some((cd) => d.startsWith(cd === "화" ? "Tu" : cd === "월" ? "Mo" : cd === "수" ? "We" : cd === "목" ? "Th" : cd === "금" ? "Fr" : cd === "토" ? "Sa" : "Su"))
-          )
-        : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
-      opens: store.hours.open,
-      closes: store.hours.close.replace("익일 ", ""),
+const website = {
+  "@type": "WebSite",
+  "@id": `${SITE}/#website`,
+  url: SITE,
+  name: "올바로갈비",
+  inLanguage: ["ko", "en", "ja"],
+  publisher: { "@id": `${SITE}/#restaurant` },
+  dateModified: "2026-07-27",
+};
+
+const localBusinesses = stores.map((store) => {
+  const base: Record<string, unknown> = {
+    "@type": "LocalBusiness",
+    "@id": `${SITE}/stores/${store.id}#store`,
+    name: store.name,
+    url: `${SITE}/stores/${store.id}`,
+    parentOrganization: { "@id": `${SITE}/#restaurant` },
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: store.address.replace("부산광역시 ", "").replace(`${store.district} `, ""),
+      addressLocality: `부산광역시 ${store.district.split(" ")[0]}`,
+      addressCountry: "KR",
     },
-  ],
-}));
+    telephone: `+82-${store.phone.replace(/-/g, "").replace(/^0/, "")}`,
+  };
+  if (store.heroImage) {
+    base.image = `${SITE}${store.heroImage}`;
+  }
+  if (store.lat !== undefined && store.lng !== undefined) {
+    base.geo = { "@type": "GeoCoordinates", latitude: store.lat, longitude: store.lng };
+  }
+  if (store.hours) {
+    const closedDays = store.hours.closedDays;
+    base.openingHoursSpecification = [
+      {
+        "@type": "OpeningHoursSpecification",
+        dayOfWeek: closedDays
+          ? ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"].filter(
+              (d) => !closedDays.some((cd) => d.startsWith(cd === "화" ? "Tu" : cd === "월" ? "Mo" : cd === "수" ? "We" : cd === "목" ? "Th" : cd === "금" ? "Fr" : cd === "토" ? "Sa" : "Su"))
+            )
+          : ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"],
+        opens: store.hours.open,
+        closes: store.hours.close.replace("익일 ", ""),
+      },
+    ];
+  }
+  return base;
+});
 
 const menu = {
   "@type": "Menu",
@@ -83,27 +105,27 @@ const menu = {
   ],
 };
 
-const faqPage = {
+// FAQ 아코디언은 /franchise 에만 렌더되므로 FAQPage 스키마도 그 페이지에서 주입한다 (화면과 1:1 원칙).
+export const faqPageJsonLd = {
+  "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: [
-    {
-      "@type": "Question",
-      name: "가맹 창업 비용은 얼마인가요?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "가맹비 550만 + 교육비 550만 = 최초 가맹금 1,100만원 (보증금 0원). 인테리어·기기 등 기타 비용은 30평 기준 약 9,570만원입니다 (점포 임대 제외). 매월 매출의 1.65% 로열티가 부과됩니다. 자세한 내용은 정보공개서 2025.0854에서 확인하세요.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "양념돼지갈비 가격은 왜 이렇게 쌉니까?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text: "본사 통일 단가로 100g 3,500원에 제공합니다. 전 매장 동일 단가이며 상차림비 3,000원이 테이블당 부과됩니다.",
-      },
-    },
-  ],
+  "@id": `${SITE}/franchise#faq`,
+  mainEntity: faqItems.map((item) => ({
+    "@type": "Question",
+    name: item.question,
+    acceptedAnswer: { "@type": "Answer", text: item.answer },
+  })),
 };
+
+export const storeBreadcrumbJsonLd = (storeId: string, storeName: string) => ({
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "홈", item: `${SITE}/` },
+    { "@type": "ListItem", position: 2, name: "매장", item: `${SITE}/#stores` },
+    { "@type": "ListItem", position: 3, name: storeName, item: `${SITE}/stores/${storeId}` },
+  ],
+});
 
 const breadcrumbs = {
   "@type": "BreadcrumbList",
@@ -115,5 +137,5 @@ const breadcrumbs = {
 
 export const jsonLdGraph = {
   "@context": "https://schema.org",
-  "@graph": [restaurant, ...localBusinesses, menu, faqPage, breadcrumbs],
+  "@graph": [restaurant, website, ...localBusinesses, menu, breadcrumbs],
 };

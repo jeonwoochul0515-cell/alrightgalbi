@@ -6,6 +6,7 @@ import { Button } from "../components/atoms/Button";
 import { Badge } from "../components/atoms/Badge";
 import { MenuCard } from "../components/molecules/MenuCard";
 import { getStoreBySlug } from "../data/stores";
+import { storeBreadcrumbJsonLd } from "../lib/jsonld";
 import { menuItems, tableCharge } from "../data/menu";
 import type { Slug } from "../types/domain";
 
@@ -24,20 +25,41 @@ export function StoreDetailPage() {
         <title>{store.name} | olbaroGALBI</title>
         <meta
           name="description"
-          content={`${store.name} - ${store.address}. ${store.access}. 영업 ${store.hours.open}-${store.hours.close}.`}
+          content={`${store.name} - ${store.address}.${store.access ? ` ${store.access}.` : ""}${store.hours ? ` 영업 ${store.hours.open}-${store.hours.close}.` : ""}`}
         />
-        <link rel="canonical" href={`https://olbarogalbi.web.app/stores/${store.id}`} />
+        <link rel="canonical" href={`https://olbarogalbi.com/stores/${store.id}`} />
+        <meta property="og:url" content={`https://olbarogalbi.com/stores/${store.id}`} />
+        <meta property="og:title" content={`${store.name} | olbaroGALBI`} />
+        <meta
+          property="og:description"
+          content={`${store.name} - ${store.address}.${store.access ? ` ${store.access}.` : ""}`}
+        />
+        {store.heroImage && (
+          <meta property="og:image" content={`https://olbarogalbi.com${store.heroImage}`} />
+        )}
+        <script type="application/ld+json">
+          {JSON.stringify(storeBreadcrumbJsonLd(store.id, store.name))}
+        </script>
       </Helmet>
 
-      <section className="relative pt-[140px] md:pt-[180px] pb-16 overflow-hidden grain">
+      <section className="relative pt-[140px] md:pt-[200px] pb-20 md:pb-28 overflow-hidden grain min-h-[420px] md:min-h-[520px]">
+        {store.heroImage && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 bg-cover bg-center"
+            style={{
+              backgroundImage: `url(${store.heroImage})`,
+              filter: "saturate(0.9) brightness(0.78)",
+            }}
+          />
+        )}
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url(${store.heroImage})` }}
+          className="absolute inset-0 bg-gradient-to-b from-[rgba(11,9,7,0.78)] via-[rgba(11,9,7,0.4)] to-[var(--color-charcoal-900)]"
         />
         <div
           aria-hidden="true"
-          className="absolute inset-0 bg-gradient-to-b from-[var(--color-charcoal-950)] via-[rgba(11,9,7,0.85)] to-[var(--color-charcoal-900)]"
+          className="absolute inset-0 bg-gradient-to-r from-[rgba(11,9,7,0.85)] via-[rgba(11,9,7,0.4)] to-[rgba(11,9,7,0.15)]"
         />
         <div className="relative container-page max-w-[1100px]">
           <Link
@@ -48,7 +70,11 @@ export function StoreDetailPage() {
           </Link>
           <div className="flex items-center gap-3 mb-3">
             {store.isFlagship && <Badge tone="brass">FLAGSHIP</Badge>}
-            <Badge tone="ember">DIRECT 직영</Badge>
+            {store.isDirect ? (
+              <Badge tone="ember">DIRECT 직영</Badge>
+            ) : (
+              <Badge tone="outline">PARTNER 가맹</Badge>
+            )}
           </div>
           <Heading level={1} display="lg">
             {store.name}
@@ -90,31 +116,46 @@ export function StoreDetailPage() {
                   </a>
                 </dd>
               </div>
-              <div>
-                <dt className="text-[12px] text-[var(--color-fg-soft)] font-semibold uppercase tracking-[0.08em] mb-1">
-                  영업시간
-                </dt>
-                <dd className="text-[var(--color-fg)]">
-                  {store.hours.open} – {store.hours.close}
-                  {store.hours.lastOrder && (
-                    <span className="text-[13px] text-[var(--color-fg-muted)]">
-                      {" "}
-                      (LO {store.hours.lastOrder})
-                    </span>
-                  )}
-                  {store.hours.closedDays && store.hours.closedDays.length > 0 && (
-                    <div className="text-[13px] text-[var(--color-fg-muted)] mt-1">
-                      휴무: 매주 {store.hours.closedDays.join(", ")}요일
-                    </div>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[12px] text-[var(--color-fg-soft)] font-semibold uppercase tracking-[0.08em] mb-1">
-                  교통
-                </dt>
-                <dd className="text-[var(--color-fg)]">{store.access}</dd>
-              </div>
+              {store.hours && (
+                <div>
+                  <dt className="text-[12px] text-[var(--color-fg-soft)] font-semibold uppercase tracking-[0.08em] mb-1">
+                    영업시간
+                  </dt>
+                  <dd className="text-[var(--color-fg)]">
+                    {store.hours.open} – {store.hours.close}
+                    {store.hours.lastOrder && (
+                      <span className="text-[13px] text-[var(--color-fg-muted)]">
+                        {" "}
+                        (LO {store.hours.lastOrder})
+                      </span>
+                    )}
+                    {store.hours.closedDays && store.hours.closedDays.length > 0 && (
+                      <div className="text-[13px] text-[var(--color-fg-muted)] mt-1">
+                        휴무: 매주 {store.hours.closedDays.join(", ")}요일
+                      </div>
+                    )}
+                  </dd>
+                </div>
+              )}
+              {store.access && (
+                <div>
+                  <dt className="text-[12px] text-[var(--color-fg-soft)] font-semibold uppercase tracking-[0.08em] mb-1">
+                    교통
+                  </dt>
+                  <dd className="text-[var(--color-fg)]">{store.access}</dd>
+                </div>
+              )}
+              {!store.isDirect && (
+                <div>
+                  <dt className="text-[12px] text-[var(--color-fg-soft)] font-semibold uppercase tracking-[0.08em] mb-1">
+                    영업시간·휴무
+                  </dt>
+                  <dd className="text-[13px] text-[var(--color-fg-muted)] leading-[1.7]">
+                    가맹점은 매장별로 운영 시간이 다를 수 있습니다. 정확한 영업시간·휴무는
+                    매장 전화로 확인해 주세요.
+                  </dd>
+                </div>
+              )}
             </dl>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -135,7 +176,7 @@ export function StoreDetailPage() {
               매장 특징
             </h2>
             <ul className="space-y-3">
-              {store.features.map((f) => (
+              {(store.features ?? []).map((f) => (
                 <li
                   key={f}
                   className="flex items-start gap-3 text-[15px] text-[var(--color-fg)]"

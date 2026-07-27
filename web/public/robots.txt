@@ -1,6 +1,7 @@
-# 올바로갈비 robots.txt
-# https://olbarogalbi.web.app/robots.txt
+# 올바로갈비 robots.txt — https://olbarogalbi.com/robots.txt
+# 검색봇·AI 검색봇 전면 허용 (JS/CSS/이미지 차단 없음)
 
+# 네이버
 User-agent: Yeti
 Allow: /
 
@@ -10,16 +11,51 @@ Allow: /
 User-agent: NaverBot
 Allow: /
 
+# 구글
 User-agent: Googlebot
 Allow: /
 
 User-agent: Googlebot-Image
 Allow: /
 
+# 빙 (Copilot 기반)
 User-agent: Bingbot
 Allow: /
 
+# 다음
 User-agent: Daumoa
+Allow: /
+
+# AI 검색/응답 크롤러 — 생성형 엔진 인용(GEO) 대상
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+# AI 학습 크롤러 — 브랜드 도달 극대화를 위해 허용
+User-agent: GPTBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: CCBot
 Allow: /
 
 User-agent: *
@@ -28,4 +64,4 @@ Disallow: /admin/
 Disallow: /api/private/
 Disallow: /*?utm_
 
-Sitemap: https://olbarogalbi.web.app/sitemap.xml
+Sitemap: https://olbarogalbi.com/sitemap.xml

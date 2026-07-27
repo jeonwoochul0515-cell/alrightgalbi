@@ -1,11 +1,22 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
+import { jsonLdGraph } from "./src/lib/jsonld";
+
+// index.html의 __JSONLD__ 자리에 src/lib/jsonld.ts 그래프를 주입 — 데이터 단일 소스 유지
+function injectJsonLd(): Plugin {
+  return {
+    name: "inject-jsonld",
+    transformIndexHtml(html) {
+      return html.replace("__JSONLD__", JSON.stringify(jsonLdGraph));
+    },
+  };
+}
 
 export default defineConfig({
   base: "/",
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), injectJsonLd()],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
