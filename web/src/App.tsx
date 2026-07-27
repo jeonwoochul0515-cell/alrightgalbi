@@ -63,7 +63,7 @@ function App() {
         </div>
         <div className="footer-cell">
           <strong>DIRECT STORES</strong>
-          <span>부전(서면) · 화명 · 김해외동</span>
+          <span>서면 · 화명 · 김해외동</span>
         </div>
         <div className="footer-cell">
           <strong>LEGAL</strong>

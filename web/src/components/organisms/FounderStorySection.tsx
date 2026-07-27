@@ -46,9 +46,6 @@ export function FounderStorySection() {
                   2025년 3월 부산 부전동에서 1호점을 열었습니다. 북구 화명·김해 외동까지 직영 3개점을 1년 동안 직접 운영하면서, 양념돼지갈비 100g <strong className="text-[var(--color-brass-300)]">3,500원</strong>이라는 단가가 마케팅 슬로건이 아니라 본사 직매입과 통일된 화덕·숯불직화기 시스템으로 유지 가능하다는 사실을 데이터로 확인했습니다.
                 </p>
                 <p>
-                  그리고 정보공개서 <strong className="text-[var(--color-fg-strong)]">2025.0854</strong>로 가맹사업을 공식 시작했습니다. 가맹비·교육비·로열티·차액가맹금·운영 중 모든 부담을 한 장의 공식 문서로 묶었습니다. 본사가 식자재로 마진을 챙기지 않는 구조를 그대로 등재했고, 2024년 가맹점당 평균 차액가맹금은 <strong className="text-[var(--color-brass-300)]">0원</strong>입니다.
-                </p>
-                <p>
                   현재 부산·경남·대구 10개 매장이 같은 단가, 같은 매뉴얼로 운영되고 있습니다. 가맹점주가 의사결정을 내리기 전에 알아야 할 모든 비용과 리스크는 정보공개서에 그대로 적혀 있고, 본사는 그 외의 어떤 비용도 따로 만들지 않습니다.
                 </p>
                 <p className="text-[var(--color-fg-strong)] font-bold text-[17px] md:text-[19px] leading-[1.7]">

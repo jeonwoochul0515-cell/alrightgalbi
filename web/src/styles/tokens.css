@@ -1,23 +1,25 @@
 @import "tailwindcss";
 
 @theme {
-  /* === Charcoal Kiln palette (A안) === */
-  --color-charcoal-950: #0F0E0D;
-  --color-charcoal-900: #1C1A18;
-  --color-charcoal-800: #2A2724;
-  --color-charcoal-700: #3A3631;
-  --color-charcoal-600: #4F4843;
-  --color-ivory-50: #FBF7EC;
-  --color-ivory-100: #F4ECD8;
-  --color-ivory-200: #E8DEC3;
-  --color-ivory-300: #D9CFB3;
+  /* === Ivory Kiln palette (라이트 모드) ===
+     의미 유지: 시맨틱은 그대로, charcoal-* 값은 베이지 톤(메인보다 더 깊은 자리일수록 더 진함),
+     ivory-* 값은 어두운 텍스트 톤(50이 가장 진함). */
+  --color-charcoal-950: #EFE6CA; /* footer/header 등 가장 깊은 라이트 톤 */
+  --color-charcoal-900: #FFFFF0; /* 메인 배경 (요청 색) */
+  --color-charcoal-800: #F8F2DE; /* elev (카드) */
+  --color-charcoal-700: #EFE6CA; /* chip 배경 */
+  --color-charcoal-600: #DDD3B0; /* 강한 chip */
+  --color-ivory-50: #15110E; /* 가장 진한 텍스트 */
+  --color-ivory-100: #28221E; /* 본문 텍스트 */
+  --color-ivory-200: #3F352E; /* 약간 옅음 */
+  --color-ivory-300: #5C5046; /* 보조 텍스트 */
   --color-ember-400: #D44A38;
   --color-ember-500: #C0392B;
   --color-ember-600: #A12E22;
-  --color-brass-300: #D9B46E;
-  --color-brass-400: #C79B54;
-  --color-brass-500: #B08545;
-  --color-brass-600: #8E6A36;
+  --color-brass-300: #B0843A;
+  --color-brass-400: #9A7028;
+  --color-brass-500: #7E5A1E;
+  --color-brass-600: #5F4515;
 
   /* Semantic */
   --color-bg: var(--color-charcoal-900);
@@ -25,14 +27,14 @@
   --color-bg-elev2: var(--color-charcoal-700);
   --color-fg: var(--color-ivory-100);
   --color-fg-strong: var(--color-ivory-50);
-  --color-fg-muted: rgba(244, 236, 216, 0.72);
-  --color-fg-soft: rgba(244, 236, 216, 0.5);
+  --color-fg-muted: rgba(21, 17, 14, 0.70);
+  --color-fg-soft: rgba(21, 17, 14, 0.50);
   --color-accent: var(--color-ember-500);
   --color-accent-bright: var(--color-ember-400);
   --color-accent-alt: var(--color-brass-500);
-  --color-focus: var(--color-brass-400);
-  --color-border: rgba(244, 236, 216, 0.12);
-  --color-border-strong: rgba(244, 236, 216, 0.22);
+  --color-focus: var(--color-brass-500);
+  --color-border: rgba(21, 17, 14, 0.10);
+  --color-border-strong: rgba(21, 17, 14, 0.18);
 
   /* Fonts */
   --font-sans: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,

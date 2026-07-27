@@ -49,7 +49,28 @@
       "Bash(git -C \"C:\\\\Users\\\\jeonw\\\\.antigravity\\\\alrightgalbi\" diff --cached --stat)",
       "Bash(grep -E \"\\\\.\\(jpg|png\\)$\")",
       "Bash(git rm *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(grep -E \"촬영|7487|\\\\.jpg$\")",
+      "PowerShell(git rm *)",
+      "Bash(git commit -m ' *)",
+      "Bash(gh repo *)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(curl -s http://localhost:5173/ -o /tmp/home.html -w \"HTTP=%{http_code}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(to-png http://localhost:5173/ --output /tmp/home_full.png --full-page --wait-until networkidle0 --wait-ms 1500)",
+      "PowerShell(to-png *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Get-ChildItem *)",
+      "Bash(node /c/Users/jeonw/tools/headless-tools/to-png.mjs --help)",
+      "Bash(node /c/Users/jeonw/tools/headless-tools/to-png.mjs http://localhost:5173/ /tmp/hero.png --width 1440 --height 900 --wait-until networkidle0 --wait-ms 2000)",
+      "Bash(node /c/Users/jeonw/tools/headless-tools/to-png.mjs http://localhost:5173/#stores /tmp/stores.png --width 1440 --height 900 --full-page --wait-until networkidle0 --wait-ms 2000)",
+      "Bash(node /c/Users/jeonw/tools/headless-tools/to-png.mjs http://localhost:5173/ /tmp/stores_section.png --width 1440 --height 900 --wait-until networkidle0 --wait-ms 2500 --selector \"#stores\")",
+      "Bash(node /c/Users/jeonw/tools/headless-tools/to-png.mjs http://localhost:5173/ /tmp/full.png --width 1440 --height 900 --full-page --wait-until networkidle0 --wait-ms 2500)",
+      "Bash(node -e \"const sharp=require\\('./web/node_modules/sharp'\\);\\(async\\(\\)=>{const m=await sharp\\('C:/Users/jeonw/AppData/Local/Temp/full.png'\\).metadata\\(\\);console.log\\('size',m.width,'x',m.height\\);}\\)\\(\\);\")",
+      "Bash(node *)",
+      "Bash(curl -s \"http://localhost:5173/franchise\" -o /tmp/franchise.html)",
+      "Bash(xargs grep -l '\"name\": \"puppeteer\"')",
+      "Bash(curl -s -o /dev/null -w \"HTTP=%{http_code}\\\\n\" http://localhost:5173/en)"
     ]
   }
 }

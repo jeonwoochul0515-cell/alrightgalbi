@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import { Wordmark } from "../atoms/Wordmark";
 import { cn } from "../../utils/cn";
 
@@ -10,9 +10,23 @@ const navLinks = [
   { to: "/franchise", label: "가맹모집" },
 ];
 
+const locales = [
+  { code: "ko", path: "/", label: "KO" },
+  { code: "en", path: "/en", label: "EN" },
+  { code: "ja", path: "/ja", label: "JA" },
+] as const;
+
+function currentLocale(pathname: string): "ko" | "en" | "ja" {
+  if (pathname.startsWith("/en")) return "en";
+  if (pathname.startsWith("/ja")) return "ja";
+  return "ko";
+}
+
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
+  const active = currentLocale(pathname);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -32,7 +46,7 @@ export function SiteHeader() {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
         scrolled
-          ? "bg-[rgba(15,14,13,0.85)] backdrop-blur-md border-b border-[var(--color-border)]"
+          ? "bg-[rgba(255,255,240,0.92)] backdrop-blur-md border-b border-[var(--color-border)]"
           : "bg-transparent"
       )}
     >
@@ -62,9 +76,30 @@ export function SiteHeader() {
               {link.label}
             </NavLink>
           ))}
+          <div
+            role="group"
+            aria-label="Language / 言語"
+            className="ml-3 flex items-center gap-0.5 px-1 py-0.5 rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elev)]"
+          >
+            {locales.map((l) => (
+              <Link
+                key={l.code}
+                to={l.path}
+                className={cn(
+                  "px-2.5 py-1 text-[11.5px] font-bold tracking-[0.08em] rounded-[4px] transition-colors min-h-[28px] inline-flex items-center",
+                  active === l.code
+                    ? "bg-[var(--color-brass-500)] text-white"
+                    : "text-[var(--color-fg-muted)] hover:text-[var(--color-fg-strong)]"
+                )}
+                aria-current={active === l.code ? "page" : undefined}
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
           <a
             href="tel:01057224929"
-            className="ml-3 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--color-ember-500)] text-[var(--color-ivory-50)] text-[13px] font-bold hover:bg-[var(--color-ember-400)] transition-colors min-h-[44px]"
+            className="ml-2 inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[var(--color-ember-500)] text-white text-[13px] font-bold hover:bg-[var(--color-ember-400)] transition-colors min-h-[44px]"
           >
             본사 010-5722-4929
           </a>
@@ -106,9 +141,30 @@ export function SiteHeader() {
                 {link.label}
               </Link>
             ))}
+            <div
+              role="group"
+              aria-label="Language / 言語"
+              className="mt-6 flex items-center gap-1 p-1 rounded-md border border-[var(--color-border)] bg-[var(--color-bg-elev)] w-fit"
+            >
+              {locales.map((l) => (
+                <Link
+                  key={l.code}
+                  to={l.path}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "px-3.5 py-2 text-[13px] font-bold tracking-[0.08em] rounded-[4px] transition-colors min-h-[40px] inline-flex items-center",
+                    active === l.code
+                      ? "bg-[var(--color-brass-500)] text-white"
+                      : "text-[var(--color-fg-muted)] hover:text-[var(--color-fg-strong)]"
+                  )}
+                >
+                  {l.label}
+                </Link>
+              ))}
+            </div>
             <a
               href="tel:01057224929"
-              className="mt-6 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-md bg-[var(--color-ember-500)] text-[var(--color-ivory-50)] text-[16px] font-bold"
+              className="mt-4 inline-flex items-center justify-center gap-2 px-6 py-4 rounded-md bg-[var(--color-ember-500)] text-white text-[16px] font-bold"
             >
               본사 010-5722-4929
             </a>

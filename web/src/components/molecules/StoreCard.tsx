@@ -10,6 +10,7 @@ interface Props {
 }
 
 export function StoreCard({ store, compact, className }: Props) {
+  const features = store.features ?? [];
   return (
     <article
       className={cn(
@@ -26,7 +27,10 @@ export function StoreCard({ store, compact, className }: Props) {
             {store.district}
           </p>
         </div>
-        {store.isFlagship && <Badge tone="brass">FLAGSHIP</Badge>}
+        <div className="flex flex-col items-end gap-1">
+          {store.isFlagship && <Badge tone="brass">FLAGSHIP</Badge>}
+          {!store.isDirect && <Badge tone="outline">PARTNER</Badge>}
+        </div>
       </div>
 
       <p className="text-[13px] text-[var(--color-fg-muted)] leading-[1.7]">
@@ -35,34 +39,46 @@ export function StoreCard({ store, compact, className }: Props) {
 
       {!compact && (
         <>
-          <dl className="grid grid-cols-[64px_1fr] gap-y-1 text-[13px] mt-1">
-            <dt className="text-[var(--color-brass-400)] font-semibold">영업</dt>
-            <dd className="text-[var(--color-fg)]">
-              {store.hours.open}–{store.hours.close}
-              {store.hours.lastOrder && (
-                <span className="text-[var(--color-fg-soft)]"> (LO {store.hours.lastOrder})</span>
+          {(store.hours || store.access) && (
+            <dl className="grid grid-cols-[64px_1fr] gap-y-1 text-[13px] mt-1">
+              {store.hours && (
+                <>
+                  <dt className="text-[var(--color-brass-400)] font-semibold">영업</dt>
+                  <dd className="text-[var(--color-fg)]">
+                    {store.hours.open}–{store.hours.close}
+                    {store.hours.lastOrder && (
+                      <span className="text-[var(--color-fg-soft)]"> (LO {store.hours.lastOrder})</span>
+                    )}
+                  </dd>
+                </>
               )}
-            </dd>
-            {store.hours.closedDays && store.hours.closedDays.length > 0 && (
-              <>
-                <dt className="text-[var(--color-brass-400)] font-semibold">휴무</dt>
-                <dd className="text-[var(--color-fg)]">{store.hours.closedDays.join(", ")}요일</dd>
-              </>
-            )}
-            <dt className="text-[var(--color-brass-400)] font-semibold">교통</dt>
-            <dd className="text-[var(--color-fg-muted)]">{store.access}</dd>
-          </dl>
+              {store.hours?.closedDays && store.hours.closedDays.length > 0 && (
+                <>
+                  <dt className="text-[var(--color-brass-400)] font-semibold">휴무</dt>
+                  <dd className="text-[var(--color-fg)]">{store.hours.closedDays.join(", ")}요일</dd>
+                </>
+              )}
+              {store.access && (
+                <>
+                  <dt className="text-[var(--color-brass-400)] font-semibold">교통</dt>
+                  <dd className="text-[var(--color-fg-muted)]">{store.access}</dd>
+                </>
+              )}
+            </dl>
+          )}
 
-          <div className="flex flex-wrap gap-1.5 mt-1">
-            {store.features.slice(0, 3).map((f) => (
-              <span
-                key={f}
-                className="text-[11px] px-2 py-0.5 rounded-[4px] bg-[var(--color-charcoal-700)] text-[var(--color-fg-muted)]"
-              >
-                {f}
-              </span>
-            ))}
-          </div>
+          {features.length > 0 && (
+            <div className="flex flex-wrap gap-1.5 mt-1">
+              {features.slice(0, 3).map((f) => (
+                <span
+                  key={f}
+                  className="text-[11px] px-2 py-0.5 rounded-[4px] bg-[var(--color-charcoal-700)] text-[var(--color-fg-muted)]"
+                >
+                  {f}
+                </span>
+              ))}
+            </div>
+          )}
         </>
       )}
 

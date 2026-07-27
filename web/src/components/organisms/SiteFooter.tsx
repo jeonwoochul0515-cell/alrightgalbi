@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Wordmark } from "../atoms/Wordmark";
-import { stores } from "../../data/stores";
+import { directStores, partnerStores } from "../../data/stores";
 
 export function SiteFooter() {
   return (
@@ -9,10 +9,12 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-8">
           <div className="md:col-span-4">
             <Wordmark size="md" showKor />
-            <p className="mt-6 text-[13px] text-[var(--color-fg-muted)] leading-[1.85] max-w-[34ch]">
-              부산이 길러낸 가성비 한식 갈비 가맹본부.
+            <p className="mt-6 text-[13.5px] text-[var(--color-fg)] leading-[1.85] max-w-[34ch] font-semibold">
+              좋은 고기를, 더 올바르게.
               <br />
-              같이 가요, 올바로.
+              부담 없이 즐기고
+              <br />
+              오래 기억되는 갈비 브랜드.
             </p>
             <a
               href="tel:01057224929"
@@ -47,15 +49,32 @@ export function SiteFooter() {
 
           <div className="md:col-span-3">
             <h3 className="text-[11px] font-bold text-[var(--color-brass-400)] uppercase tracking-[0.16em] mb-4">
-              직영 매장
+              매장 안내
             </h3>
-            <ul className="text-[13px] leading-[1.9] text-[var(--color-fg-muted)] space-y-3">
-              {stores.map((s) => (
+
+            <p className="text-[10.5px] font-bold tracking-[0.1em] text-[var(--color-ember-400)] uppercase mb-2">
+              Direct · 본사 직영 {directStores.length}
+            </p>
+            <ul className="text-[13px] leading-[1.9] text-[var(--color-fg-muted)] space-y-2.5 mb-5">
+              {directStores.map((s) => (
                 <li key={s.id}>
                   <Link to={`/stores/${s.id}`} className="hover:text-[var(--color-brass-300)]">
                     <span className="text-[var(--color-fg)]">{s.shortName}</span>
-                    <br />
-                    <span className="text-[11px]">{s.district}</span>
+                    <span className="text-[11px] text-[var(--color-fg-soft)] ml-2">{s.district}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <p className="text-[10.5px] font-bold tracking-[0.1em] text-[var(--color-brass-400)] uppercase mb-2">
+              Partner · 가맹 {partnerStores.length}
+            </p>
+            <ul className="text-[12.5px] leading-[1.9] text-[var(--color-fg-muted)] space-y-2">
+              {partnerStores.map((s) => (
+                <li key={s.id}>
+                  <Link to={`/stores/${s.id}`} className="hover:text-[var(--color-brass-300)]">
+                    <span className="text-[var(--color-fg)]">{s.shortName}</span>
+                    <span className="text-[11px] text-[var(--color-fg-soft)] ml-2">{s.district}</span>
                   </Link>
                 </li>
               ))}

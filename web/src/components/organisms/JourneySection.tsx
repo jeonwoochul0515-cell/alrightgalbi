@@ -16,7 +16,7 @@ const milestones: Milestone[] = [
   {
     id: "founding",
     period: "2025.03",
-    title: "본사 직영 1호점, 부산 부전(서면)",
+    title: "본사 직영 1호점, 부산 서면",
     description:
       "양념돼지갈비 100g 3,500원 단일 가격으로 시작. 본사 직매입·화덕·숯불직화기 통일 시스템을 직접 운영하며 검증.",
   },
