@@ -18,3 +18,10 @@
 ## 주의
 - 카페24 hosting.cafe24.com의 dnsXxxPop 팝업 페이지는 CDP(자동화 도구) 연결 시 렌더러가 얼어붙는 문제 있음. DNS 레코드 추가는 팝업 UI 대신 `POST /?controller=myservice_domain_vservice&method=dns_txt_add|dns_cname_add` (body: mode=add, subName, txt|realDomain, domain, controller, serverMode) 방식이 안전. 응답 JSON의 bResult로 성공 판정.
 - `POST` 라우팅 파라미터(controller/method)는 **URL 쿼리에** 있어야 함. body에 넣으면 무시되고 전체 페이지 HTML이 반환됨.
+
+## 2026-07-28 추가 — olbarogalbi.com 인증서 발급 완료 (해결 기록)
+- 증상: 카페24 네임서버 상태에서 Firebase 인증서 발급이 DNS_SERVFAIL로 무한 반복 (공개 리졸버 조회는 전부 정상).
+- 해결: DNS를 클라우드플레어로 이전(무료 플랜, 등록기관은 카페24 유지). 레코드 A/TXT/CNAME(www) DNS 전용(프록시 OFF), 카페24 시스템 와일드카드(*.domain→apex CNAME)는 이전하지 않음.
+- 카페24 네임서버 변경은 본인인증(사용자) 후 `POST /?controller=myservice_domain_info&method=nameserver_change`로 처리. **nameserver_ip1/2까지 채워야 성공** (호스트명만 넣으면 bResult:false).
+- NS 이전 후에도 구글 내부 캐시로 몇 시간 SERVFAIL 지속 → 이전 약 5시간 후 자동 해소, https 발급 완료.
+- Firebase 커스텀 도메인 재평가 강제: `PATCH v1beta1/.../customDomains/{domain}?updateMask=certPreference` (firebase-tools refresh_token으로 토큰 발급). 삭제는 소프트 삭제(30일 보관)라 즉시 재생성 불가 — :undelete로 복원 가능.
