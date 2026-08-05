@@ -25,3 +25,9 @@
 - 카페24 네임서버 변경은 본인인증(사용자) 후 `POST /?controller=myservice_domain_info&method=nameserver_change`로 처리. **nameserver_ip1/2까지 채워야 성공** (호스트명만 넣으면 bResult:false).
 - NS 이전 후에도 구글 내부 캐시로 몇 시간 SERVFAIL 지속 → 이전 약 5시간 후 자동 해소, https 발급 완료.
 - Firebase 커스텀 도메인 재평가 강제: `PATCH v1beta1/.../customDomains/{domain}?updateMask=certPreference` (firebase-tools refresh_token으로 토큰 발급). 삭제는 소프트 삭제(30일 보관)라 즉시 재생성 불가 — :undelete로 복원 가능.
+
+## 2026-08-05 추가 — 크롬에서만 "Site Not Found" (CDN 캐시 오염, 해결 기록)
+- 증상: 크롬에서 https://olbarogalbi.com/ 접속 시 Firebase "Site Not Found"(404). curl 기본 요청은 200 정상. DNS·도메인 연결·인증서 모두 정상이었음.
+- 원인: Fastly ICN 엣지 캐시에 **br/zstd 인코딩 변형의 `/` 응답이 404로 오염**되어 있었음 (`Vary: accept-encoding`이라 인코딩별로 캐시가 분리됨). 크롬은 `Accept-Encoding: br, zstd`를 보내므로 오염된 변형에 걸리고, 압축 없는 curl은 정상 변형(200)에 걸림. 같은 페이지의 favicon.ico는 200이라 도메인 매핑 문제가 아님을 판별.
+- 판별법: ① `curl -H "Accept-Encoding: gzip, deflate, br, zstd" -sI <URL>` → 404 + `X-Cache: HIT` ② 고유 쿼리(`?cachebust=랜덤`)로 캐시 우회 → 200이면 원본 정상 = 캐시 오염 확정.
+- 해결: `npx firebase-tools deploy --only hosting` 재배포 — Firebase는 배포 시 CDN 캐시를 전량 퍼지함. 배포 직후 br 변형도 200(X-Cache: MISS) 복구 확인. Firebase에는 수동 캐시 퍼지 API가 없으므로 재배포가 유일한 즉효약.
