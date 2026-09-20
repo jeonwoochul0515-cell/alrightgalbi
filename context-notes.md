@@ -52,3 +52,32 @@
 ### 검증 스크립트
 - `scripts/verify-rules.mjs` — 에뮬레이터 기동 후 실행. 비인증 쓰기 차단·문의 읽기 차단 등 보안 규칙 7종 확인.
 - `scripts/verify-prod-admin.mjs` — 운영 사이트 대상. 로그인→저장→복구까지 확인하며 값을 원복하므로 운영 데이터를 바꾸지 않는다.
+
+## 2026-09-20 추가 — 검색엔진용 정적 HTML 재배포 파이프라인
+
+### 왜 필요했나
+관리자에서 저장하면 **방문자 화면은 1.4초 만에 바뀌지만**(실측), 검색봇·카카오톡 미리보기가 읽는 프리렌더된 정적 HTML은 빌드 시점에 고정돼 있다. 즉 콘텐츠를 바꿔도 재배포 전까지 구글·네이버·카톡에는 옛 내용이 나간다.
+
+### 구조 (GitHub PAT 없이 동작)
+1. 관리자가 `/admin` 상단 패널에서 "지금 반영하기" → Firestore `site_publish/state` 에 `status: requested` 기록
+2. GitHub Actions(`.github/workflows/publish.yml`)가 **5분 간격 cron** 으로 요청을 확인
+3. 요청이 있으면 `building` 기록 → `npm ci` → 프리렌더 빌드 → `firebase deploy --only hosting` → `done` + `publishedAt` 기록
+4. 관리자 화면은 이 문서를 실시간 구독해 진행 상태와 실행 로그 링크를 보여준다
+
+**Cloud Function 을 거치지 않는 이유**: 서버에서 GitHub API 를 호출하려면 PAT 가 필요한데, fine-grained PAT 는 브라우저로만 만들 수 있고 기존 gh CLI 토큰은 권한이 과도하다. 저장소가 public 이라 Actions 사용량이 무제한이므로 cron 폴링이 더 단순하고 안전하다. 검색엔진 크롤링 주기가 수 시간~수일이라 5분 지연은 실질적 의미가 없다.
+
+**권한 분리**: 규칙상 관리자는 `status: 'requested'` 만 쓸 수 있고, `building`/`done`/`failed` 기록은 Admin SDK(배포 파이프라인) 전용이다. 관리자가 "배포 완료"를 위조할 수 없다.
+
+### 배포 자격증명
+- 전용 서비스 계정 `github-deployer@olbarogalbi.iam.gserviceaccount.com`
+- 역할: `roles/firebasehosting.admin`, `roles/datastore.user`, `roles/firebase.viewer`
+- JSON 키를 `gh secret set FIREBASE_SERVICE_ACCOUNT` 로 등록하고 **로컬 키 파일은 즉시 삭제**. `.gitignore` 에 `sa-key*.json` 차단 추가.
+
+### 구축 중 막혔던 것 (재발 시 참고)
+1. **`ERR_MODULE_NOT_FOUND` — CI 에서 firebase-admin 해석 실패**: ESM `import` 는 `NODE_PATH` 를 보지 않는다. `prerender.mjs` 와 동일하게 `createRequire(pathToFileURL(경로 + "/"))` 로 외부 설치 경로를 직접 해석해야 한다.
+2. **`npm ci` peer 충돌**: `react-helmet-async@2.0.5` 의 peer 범위가 React 19 를 포함하지 않아 CI 가 거부했다. `web/.npmrc` 에 `legacy-peer-deps=true` 로 로컬·CI 설치 조건을 통일. **근본 해결은 react-helmet-async 교체** — React 19 는 `<title>`·`<meta>` 를 컴포넌트에서 직접 렌더하면 head 로 자동 호이스팅하므로 이 의존성 자체를 뺄 수 있다.
+3. **임시 폴더 npm install 이 루트를 오염**: `npm init -y` 가 실패한 상태에서 `npm install` 하면 상위 `package.json` 을 찾아 거기에 설치된다. 루트 `package.json` 에 firebase-admin 이 잘못 추가돼 되돌렸다. 임시 설치는 반드시 `package.json` 생성 성공을 확인한 뒤에.
+
+### 검증 스크립트 (추가분)
+- `scripts/verify-propagation.mjs` — 저장이 방문자 화면에 반영되는 시간과, 정적 HTML 과의 차이를 실측. 값을 원복한다.
+- `scripts/verify-publish-flow.mjs` — "지금 반영하기" → 배포 → 정적 HTML 갱신 → 원복까지 전 구간 9종 확인. cron 을 기다리지 않도록 `gh workflow run` 으로 같은 경로를 즉시 실행한다.
