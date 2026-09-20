@@ -47,7 +47,7 @@ jobs:
           cd "$RUNNER_TEMP/tools"
           npm init -y >/dev/null 2>&1
           npm install firebase-admin@12 --silent
-          echo "NODE_PATH=$RUNNER_TEMP/tools/node_modules" >> "$GITHUB_ENV"
+          echo "FIREBASE_ADMIN_ROOT=$RUNNER_TEMP/tools/" >> "$GITHUB_ENV"
 
       - name: 배포 필요 여부 확인
         id: gate

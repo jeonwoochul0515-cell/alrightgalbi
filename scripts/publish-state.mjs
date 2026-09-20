@@ -7,8 +7,21 @@
 //   node scripts/publish-state.mjs done
 //   node scripts/publish-state.mjs failed "메시지"
 import { appendFileSync } from "node:fs";
-import { initializeApp, applicationDefault, getApps } from "firebase-admin/app";
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import { createRequire } from "node:module";
+import { resolve } from "node:path";
+import { pathToFileURL } from "node:url";
+
+// firebase-admin 은 이 저장소의 의존성이 아니라 밖에서 빌려 쓴다.
+// ESM import 는 NODE_PATH 를 무시하므로 createRequire 로 직접 해석한다.
+const adminRoot = process.env.FIREBASE_ADMIN_ROOT;
+if (!adminRoot) {
+  console.error("FIREBASE_ADMIN_ROOT 환경변수가 필요합니다 (firebase-admin 설치 위치).");
+  process.exit(1);
+}
+// 윈도우·리눅스 경로를 모두 안전하게 다룬다 — 디렉터리를 가리키도록 끝에 구분자를 둘다.
+const requireAdmin = createRequire(pathToFileURL(resolve(adminRoot) + "/"));
+const { initializeApp, applicationDefault, getApps } = requireAdmin("firebase-admin/app");
+const { getFirestore, FieldValue } = requireAdmin("firebase-admin/firestore");
 
 const [, , command, message] = process.argv;
 
