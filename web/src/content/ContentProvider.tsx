@@ -10,12 +10,14 @@ import type { SiteContent } from "./types";
  */
 export function ContentProvider({ children }: { children: ReactNode }) {
   const [content, setContent] = useState<SiteContent>(seedContent);
+  const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const unsub = subscribeContent(
-      (next) => {
+      (next, at) => {
         setContent(next);
+        setUpdatedAt(at);
         setLoading(false);
       },
       () => setLoading(false)
@@ -23,7 +25,10 @@ export function ContentProvider({ children }: { children: ReactNode }) {
     return unsub;
   }, []);
 
-  const value = useMemo(() => ({ ...derive(content), loading }), [content, loading]);
+  const value = useMemo(
+    () => ({ ...derive(content), loading, updatedAt }),
+    [content, loading, updatedAt]
+  );
 
   return <ContentContext.Provider value={value}>{children}</ContentContext.Provider>;
 }

@@ -19,6 +19,8 @@ export type ContentValue = SiteContent &
   DerivedContent & {
     /** Firestore 응답을 아직 못 받은 상태 (seed 로 렌더 중) */
     loading: boolean;
+    /** 마지막으로 콘텐츠가 저장된 시각 (Firestore 값이 없으면 null) */
+    updatedAt: Date | null;
   };
 
 export function derive(content: SiteContent): SiteContent & DerivedContent {
@@ -43,6 +45,7 @@ export function derive(content: SiteContent): SiteContent & DerivedContent {
 export const ContentContext = createContext<ContentValue>({
   ...derive(seedContent),
   loading: true,
+  updatedAt: null,
 });
 
 export function useContent(): ContentValue {

@@ -55,3 +55,8 @@ web/.env
 web/.env.local
 web/.env.*.local
 functions/.env
+
+# 서비스 계정 키 — 절대 커밋 금지
+sa-key*.json
+*-sa-key.json
+serviceAccount*.json

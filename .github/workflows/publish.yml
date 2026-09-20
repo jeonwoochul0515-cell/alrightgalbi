@@ -1,0 +1,93 @@
+name: 사이트 배포
+
+# 관리자 화면(/admin)에서 "지금 반영하기"를 누르면 Firestore 에 요청이 남고,
+# 이 워크플로가 그 요청을 감지해 최신 콘텐츠로 사이트를 다시 빌드·배포한다.
+# 코드를 push 했을 때도 동일하게 배포한다.
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - ".gitignore"
+  schedule:
+    # 관리자 요청을 5분 간격으로 확인한다 (public 저장소라 Actions 사용량 무제한).
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 서비스 계정 자격증명 준비
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA_JSON" ]; then
+            echo "FIREBASE_SERVICE_ACCOUNT 시크릿이 없습니다." >&2
+            exit 1
+          fi
+          printf '%s' "$SA_JSON" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+          echo "GCLOUD_PROJECT=olbarogalbi" >> "$GITHUB_ENV"
+
+      - name: 상태 도구 의존성 설치
+        run: |
+          mkdir -p "$RUNNER_TEMP/tools"
+          cd "$RUNNER_TEMP/tools"
+          npm init -y >/dev/null 2>&1
+          npm install firebase-admin@12 --silent
+          echo "NODE_PATH=$RUNNER_TEMP/tools/node_modules" >> "$GITHUB_ENV"
+
+      - name: 배포 필요 여부 확인
+        id: gate
+        run: node scripts/publish-state.mjs should-run
+
+      - name: 진행 상태 기록
+        if: steps.gate.outputs.run == 'true'
+        run: node scripts/publish-state.mjs building
+
+      - name: 웹 의존성 설치
+        if: steps.gate.outputs.run == 'true'
+        working-directory: web
+        run: npm ci
+
+      - name: 프리렌더용 puppeteer 준비
+        if: steps.gate.outputs.run == 'true'
+        run: |
+          mkdir -p "$RUNNER_TEMP/pptr"
+          cd "$RUNNER_TEMP/pptr"
+          npm init -y >/dev/null 2>&1
+          npm install puppeteer@24 --silent
+          echo "PUPPETEER_RESOLVE_ROOT=$RUNNER_TEMP/pptr/" >> "$GITHUB_ENV"
+
+      - name: 빌드 (최신 콘텐츠로 프리렌더)
+        if: steps.gate.outputs.run == 'true'
+        working-directory: web
+        run: npm run build
+
+      - name: Firebase Hosting 배포
+        if: steps.gate.outputs.run == 'true'
+        run: npx --yes firebase-tools@13 deploy --only hosting --project olbarogalbi --non-interactive
+
+      - name: 완료 기록
+        if: steps.gate.outputs.run == 'true' && success()
+        run: node scripts/publish-state.mjs done
+
+      - name: 실패 기록
+        if: steps.gate.outputs.run == 'true' && failure()
+        run: node scripts/publish-state.mjs failed "빌드 또는 배포 단계에서 실패했습니다. 진행 기록을 확인해 주세요."
+
+      - name: 건너뜀 안내
+        if: steps.gate.outputs.run != 'true'
+        run: echo "반영 요청이 없어 건너뜁니다 (${{ steps.gate.outputs.reason }})."

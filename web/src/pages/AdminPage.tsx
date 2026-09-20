@@ -6,6 +6,7 @@ import { useAdminAuth } from "../admin/useAdminAuth";
 import { AdminLogin } from "../admin/AdminLogin";
 import { SectionEditor } from "../admin/SectionEditor";
 import { InquiriesPanel } from "../admin/InquiriesPanel";
+import { PublishPanel } from "../admin/PublishPanel";
 import { useContent } from "../content/context";
 import { saveSection } from "../content/repository";
 import {
@@ -195,6 +196,7 @@ function AdminShell({ onLogout }: { onLogout: () => void }) {
       <main className="mx-auto max-w-5xl px-4 py-6">
         {activeSection ? (
           <>
+            <PublishPanel />
             <SectionEditor section={activeSection} draft={draft} patch={patch} />
 
             <div className="sticky bottom-0 -mx-4 mt-8 border-t border-zinc-800 bg-zinc-950/95 px-4 py-3 backdrop-blur">

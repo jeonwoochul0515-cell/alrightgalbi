@@ -30,7 +30,18 @@ export function stripUndefined<T>(value: T): T {
 
 type RawDoc = { id: string; data: Record<string, unknown> };
 
-/** seed 위에 Firestore 문서를 얕게 덮어쓴다. settings 만 기본값과 깊게 병합한다. */
+/** 가장 최근에 저장된 섹션의 시각 — 재배포가 필요한지 판단하는 데 쓰인다. */
+function latestUpdatedAt(docs: RawDoc[]): Date | null {
+  let latest: Date | null = null;
+  for (const d of docs) {
+    const ts = d.data.updatedAt as { toDate?: () => Date } | undefined;
+    const at = ts?.toDate?.();
+    if (at && (!latest || at > latest)) latest = at;
+  }
+  return latest;
+}
+
+/** seed 위에 Firestore 문서를 얇게 덮어쓴다. settings 만 기본값과 깊게 병합한다. */
 function merge(docs: RawDoc[]): SiteContent {
   const out: SiteContent = { ...seedContent };
   for (const d of docs) {
@@ -51,13 +62,14 @@ function merge(docs: RawDoc[]): SiteContent {
 
 /** 콘텐츠 전체를 실시간 구독한다. 실패해도 seed 로 사이트는 정상 동작한다. */
 export function subscribeContent(
-  onChange: (content: SiteContent) => void,
+  onChange: (content: SiteContent, updatedAt: Date | null) => void,
   onError?: (error: unknown) => void
 ): () => void {
   return onSnapshot(
     collection(db, COLLECTION),
     (snap) => {
-      onChange(merge(snap.docs.map((d) => ({ id: d.id, data: d.data() }))));
+      const docs = snap.docs.map((d) => ({ id: d.id, data: d.data() }));
+      onChange(merge(docs), latestUpdatedAt(docs));
     },
     (err) => {
       console.warn("site_content 구독 실패 — 기본 콘텐츠로 표시합니다.", err);

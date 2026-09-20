@@ -5,8 +5,29 @@ import { readFileSync, writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, dirname, extname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const require = createRequire("file:///C:/Users/jeonw/tools/headless-tools/");
-const puppeteer = require("puppeteer");
+// puppeteer 는 프로젝트 devDep 으로 넣지 않고 밖에서 빌려 쓴다.
+// 로컬은 전역 도구 폴더, CI 는 PUPPETEER_RESOLVE_ROOT 가 가리키는 임시 설치 폴더를 쓴다.
+const RESOLVE_ROOTS = [
+  process.env.PUPPETEER_RESOLVE_ROOT,
+  "C:/Users/jeonw/tools/headless-tools/",
+].filter(Boolean);
+
+function loadPuppeteer() {
+  const errors = [];
+  for (const root of RESOLVE_ROOTS) {
+    const base = root.endsWith("/") ? root : `${root}/`;
+    try {
+      return createRequire(base.startsWith("file://") ? base : `file:///${base.replace(/^\/+/, "")}`)(
+        "puppeteer"
+      );
+    } catch (e) {
+      errors.push(`${base}: ${e.message}`);
+    }
+  }
+  throw new Error(`puppeteer 를 찾지 못했습니다.\n${errors.join("\n")}`);
+}
+
+const puppeteer = loadPuppeteer();
 
 const DIST = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
 const PORT = 4573;
@@ -64,7 +85,10 @@ const server = createServer((req, res) => {
 
 await new Promise((r) => server.listen(PORT, r));
 
-const browser = await puppeteer.launch({ headless: "new" });
+const browser = await puppeteer.launch({
+  headless: "new",
+  args: process.env.CI ? ["--no-sandbox", "--disable-dev-shm-usage"] : [],
+});
 const page = await browser.newPage();
 await page.setViewport({ width: 1280, height: 900 });
 
