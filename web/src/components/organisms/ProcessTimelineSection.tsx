@@ -2,9 +2,10 @@ import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { ProcessStepItem } from "../molecules/ProcessStepItem";
-import { processSteps } from "../../data/franchise";
+import { useContent } from "../../content/context";
 
 export function ProcessTimelineSection() {
+  const { processSteps } = useContent();
   return (
     <Section id="process" spacing="lg" bg="default">
       <Reveal>

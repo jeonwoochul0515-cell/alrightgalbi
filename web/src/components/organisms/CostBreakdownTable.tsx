@@ -2,14 +2,11 @@ import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { CostRow } from "../molecules/CostRow";
-import {
-  franchiseCosts,
-  totalInitialFee,
-  totalOtherCost,
-} from "../../data/franchise";
 import { formatThousand } from "../../utils/format";
+import { useContent } from "../../content/context";
 
 export function CostBreakdownTable() {
+  const { franchiseCosts, totalInitialFee, totalOtherCost } = useContent();
   const groups = [
     { key: "최초가맹금" as const, label: "최초 가맹금", total: totalInitialFee },
     { key: "기타비용" as const, label: "기타 비용 (30평 기준 추정)", total: totalOtherCost },

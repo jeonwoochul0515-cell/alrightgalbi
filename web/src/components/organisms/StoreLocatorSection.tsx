@@ -2,9 +2,10 @@ import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { StoreCard } from "../molecules/StoreCard";
-import { directStores, partnerStores } from "../../data/stores";
+import { useContent } from "../../content/context";
 
 export function StoreLocatorSection() {
+  const { directStores, partnerStores } = useContent();
   return (
     <Section id="stores" spacing="lg" bg="elev">
       <Reveal>

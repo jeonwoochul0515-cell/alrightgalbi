@@ -2,10 +2,11 @@ import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { TrustBadge } from "../molecules/TrustBadge";
-import { safetyBadges } from "../../data/trustBadges";
 import { InquiryForm } from "../../features/inquiry/InquiryForm";
+import { useContent } from "../../content/context";
 
 export function InquiryFormSection() {
+  const { safetyBadges } = useContent();
   return (
     <Section id="inquiry" spacing="lg" bg="default">
       <div className="grid lg:grid-cols-12 gap-10 lg:gap-16">

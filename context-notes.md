@@ -30,4 +30,25 @@
 - 증상: 크롬에서 https://olbarogalbi.com/ 접속 시 Firebase "Site Not Found"(404). curl 기본 요청은 200 정상. DNS·도메인 연결·인증서 모두 정상이었음.
 - 원인: Fastly ICN 엣지 캐시에 **br/zstd 인코딩 변형의 `/` 응답이 404로 오염**되어 있었음 (`Vary: accept-encoding`이라 인코딩별로 캐시가 분리됨). 크롬은 `Accept-Encoding: br, zstd`를 보내므로 오염된 변형에 걸리고, 압축 없는 curl은 정상 변형(200)에 걸림. 같은 페이지의 favicon.ico는 200이라 도메인 매핑 문제가 아님을 판별.
 - 판별법: ① `curl -H "Accept-Encoding: gzip, deflate, br, zstd" -sI <URL>` → 404 + `X-Cache: HIT` ② 고유 쿼리(`?cachebust=랜덤`)로 캐시 우회 → 200이면 원본 정상 = 캐시 오염 확정.
-- 해결: `npx firebase-tools deploy --only hosting` 재배포 — Firebase는 배포 시 CDN 캐시를 전량 퍼지함. 배포 직후 br 변형도 200(X-Cache: MISS) 복구 확인. Firebase에는 수동 캐시 퍼지 API가 없으므로 재배포가 유일한 즉효약.
+- 해결: `npx firebase-tools deploy --only hosting` 재배포 — Firebase는 배포 시 CDN 캐시를 전량 퍼지함. 배포 직후 br 변형도 200(X-Cache: MISS) 복구 확인. Firebase에는 수동 캐시 퍼지 API가 없으므로 재배포가 유일한 즉효약입니다.
+
+## 2026-09-20 추가 — 관리자 페이지(/admin) 구축
+- **목적**: 코드 수정·재배포 없이 사이트 콘텐츠(매장·메뉴·FAQ·가맹비용·인스타·소식·배지·회사정보)와 리뉴얼 공사 스위치를 웹에서 직접 관리.
+- **데이터 구조**: `web/src/data/*.ts` 는 이제 **기본값(seed)** 이고, Firestore `site_content/{섹션}` 문서가 런타임에 이를 덮어쓴다(`web/src/content/`). 문서가 없으면 seed 그대로 나가므로 Firestore가 비어 있어도 사이트는 정상 동작한다.
+- **인증**: PIN을 클라이언트에서 비교하면 JS만 열어봐도 뚫리므로, `adminLogin` Function이 서버에서 PIN을 검증하고 `admin` 클레임이 담긴 custom token을 발급한다. Firestore 쓰기 권한은 오직 이 클레임에서 나온다(firestore.rules). 세션은 `browserSessionPersistence` — 탭 닫으면 로그아웃.
+- **PIN 변경**: `functions/.env` 의 `ADMIN_PIN` 수정 후 `firebase deploy --only functions`. (.env 는 커밋 제외) 코드 기본값은 `functions/src/admin.ts` 의 `FALLBACK_PIN`.
+- **무차별 대입 방어**: 4자리 PIN이라 레이트리밋이 실질적 방어선. IP당 10분에 5회 실패 시 잠금, 잠금 판정이 PIN 검증보다 먼저 실행된다(잠긴 동안은 올바른 PIN도 거부).
+- **리뉴얼 스위치**: `/admin → 사이트 설정 → 리뉴얼(공사) 모드`. 켜면 `PublicGate`(web/src/app/PublicGate.tsx)가 모든 공개 라우트를 안내 화면으로 덮는다. `/admin` 은 이 스위치와 무관하게 항상 열린다.
+- **번들 분리**: 관리자 코드와 `firebase/auth`(85kB)는 `/admin` 진입 시에만 로드되도록 lazy + manualChunks 분리. 일반 방문자 번들은 오히려 285→215kB로 감소.
+
+### 배포 시 한 번만 필요했던 두 가지 (재발 시 참고)
+1. **`auth/insufficient-permission` (custom token 발급 실패)**: Gen2 함수 런타임 SA(`516800442035-compute@developer.gserviceaccount.com`)에 signBlob 권한이 없어서 발생.
+   `gcloud iam service-accounts add-iam-policy-binding 516800442035-compute@developer.gserviceaccount.com --member="serviceAccount:516800442035-compute@developer.gserviceaccount.com" --role="roles/iam.serviceAccountTokenCreator" --project=olbarogalbi`
+   (프로젝트 레벨 바인딩만으로는 부족했고, SA 리소스에 직접 바인딩해야 통했다. 반영까지 1분 내외.)
+2. **`auth/configuration-not-found` (로그인 화면에서 실패)**: 프로젝트에 Firebase Authentication이 프로비저닝된 적이 없어서 발생.
+   `curl -X POST "https://identitytoolkit.googleapis.com/v2/projects/olbarogalbi/identityPlatform:initializeAuth" -H "Authorization: Bearer $(gcloud auth print-access-token)" -H "x-goog-user-project: olbarogalbi" -d '{}'`
+   (`x-goog-user-project` 헤더 없으면 quota project 미지정으로 403.)
+
+### 검증 스크립트
+- `scripts/verify-rules.mjs` — 에뮬레이터 기동 후 실행. 비인증 쓰기 차단·문의 읽기 차단 등 보안 규칙 7종 확인.
+- `scripts/verify-prod-admin.mjs` — 운영 사이트 대상. 로그인→저장→복구까지 확인하며 값을 원복하므로 운영 데이터를 바꾸지 않는다.

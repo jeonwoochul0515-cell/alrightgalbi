@@ -3,9 +3,10 @@ import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { FaqItem } from "../molecules/FaqItem";
-import { faqItems } from "../../data/faq";
+import { useContent } from "../../content/context";
 
 export function FaqSection() {
+  const { faqItems } = useContent();
   return (
     <Section spacing="lg" bg="elev">
       <div className="max-w-[760px] mx-auto">

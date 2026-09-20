@@ -3,7 +3,7 @@ import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { SocialProofCard } from "../molecules/SocialProofCard";
-import { socialProofItems } from "../../data/trustBadges";
+import { useContent } from "../../content/context";
 
 interface Props {
   eyebrow?: string;
@@ -16,6 +16,7 @@ export function SocialProofMosaic({
   title = "부산이 먼저 알아본 가성비.",
   intro,
 }: Props = {}) {
+  const { socialProofItems } = useContent();
   return (
     <Section spacing="md" bg="default">
       <Reveal>

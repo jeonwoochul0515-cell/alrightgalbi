@@ -5,13 +5,13 @@ import { Heading } from "../components/atoms/Heading";
 import { Button } from "../components/atoms/Button";
 import { Badge } from "../components/atoms/Badge";
 import { MenuCard } from "../components/molecules/MenuCard";
-import { getStoreBySlug } from "../data/stores";
 import { storeBreadcrumbJsonLd } from "../lib/jsonld";
-import { menuItems, tableCharge } from "../data/menu";
+import { useContent } from "../content/context";
 import type { Slug } from "../types/domain";
 
 export function StoreDetailPage() {
   const { slug } = useParams<{ slug: Slug }>();
+  const { getStoreBySlug, menuItems, tableCharge } = useContent();
   const store = slug ? getStoreBySlug(slug) : undefined;
 
   if (!store) return <Navigate to="/" replace />;

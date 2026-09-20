@@ -2,9 +2,10 @@ import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { StatCard } from "../molecules/StatCard";
-import { valueProps } from "../../data/franchise";
+import { useContent } from "../../content/context";
 
 export function ValuePropsSection() {
+  const { valueProps } = useContent();
   return (
     <Section spacing="lg" bg="default">
       <Reveal>

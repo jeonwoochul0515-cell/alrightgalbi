@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
 import { Wordmark } from "../atoms/Wordmark";
-import { directStores, partnerStores } from "../../data/stores";
+import { useContent } from "../../content/context";
 
 export function SiteFooter() {
+  const { directStores, partnerStores, settings } = useContent();
+  const telHref = `tel:${settings.hqPhone.replace(/[^0-9+]/g, "")}`;
   return (
     <footer className="bg-[var(--color-charcoal-950)] border-t border-[var(--color-border)] mt-0">
       <div className="container-page py-16 md:py-20">
@@ -17,10 +19,10 @@ export function SiteFooter() {
               오래 기억되는 갈비 브랜드.
             </p>
             <a
-              href="tel:01057224929"
+              href={telHref}
               className="inline-flex items-center gap-2 mt-6 px-5 py-3 rounded-md bg-[var(--color-ember-500)] text-[var(--color-ivory-50)] text-[14px] font-bold hover:bg-[var(--color-ember-400)] transition-colors min-h-[48px]"
             >
-              본사 010-5722-4929
+              본사 {settings.hqPhone}
             </a>
           </div>
 
@@ -31,19 +33,19 @@ export function SiteFooter() {
             <dl className="text-[13px] leading-[2] text-[var(--color-fg-muted)]">
               <div className="grid grid-cols-[60px_1fr] gap-x-2">
                 <dt className="text-[var(--color-fg-soft)]">상호</dt>
-                <dd className="text-[var(--color-fg)]">올바로갈비</dd>
+                <dd className="text-[var(--color-fg)]">{settings.companyName}</dd>
                 <dt className="text-[var(--color-fg-soft)]">대표</dt>
-                <dd className="text-[var(--color-fg)]">유종우</dd>
+                <dd className="text-[var(--color-fg)]">{settings.ceoName}</dd>
                 <dt className="text-[var(--color-fg-soft)]">사업자</dt>
-                <dd className="text-[var(--color-fg)]">728-38-01319</dd>
+                <dd className="text-[var(--color-fg)]">{settings.bizNumber}</dd>
                 <dt className="text-[var(--color-fg-soft)]">본사</dt>
-                <dd className="text-[var(--color-fg)]">부산광역시 부산진구</dd>
+                <dd className="text-[var(--color-fg)]">{settings.hqAddress}</dd>
               </div>
             </dl>
             <p className="mt-3 text-[11px] text-[var(--color-fg-soft)] leading-[1.7]">
-              개인정보 보호책임자 유종우
+              개인정보 보호책임자 {settings.ceoName}
               <br />
-              frasier2015@naver.com
+              {settings.hqEmail}
             </p>
           </div>
 
@@ -107,7 +109,9 @@ export function SiteFooter() {
 
         <div className="mt-12 pt-8 border-t border-[var(--color-border)] text-[11px] text-[var(--color-fg-soft)] leading-[1.85] space-y-2">
           <p>
-            정보공개서 등록번호 <strong className="text-[var(--color-brass-400)]">2025.0854</strong> (공정거래위원회)
+            정보공개서 등록번호{" "}
+            <strong className="text-[var(--color-brass-400)]">{settings.disclosureNumber}</strong>{" "}
+            (공정거래위원회)
             · 가맹금 예치기관 신한은행 · 피해보상보험 서울보증보험(주)
           </p>
           <p>
@@ -115,7 +119,9 @@ export function SiteFooter() {
             가맹금을 수령합니다 (가맹사업거래의 공정화에 관한 법률 §7③).
           </p>
           <p>※ 본 사이트는 가맹희망자에게 정보공개서를 요청 시 즉시 제공합니다.</p>
-          <p className="pt-2 text-[var(--color-fg-soft)]">© 2026 올바로갈비 · olbaroGALBI</p>
+          <p className="pt-2 text-[var(--color-fg-soft)]">
+            © 2026 {settings.companyName} · olbaroGALBI
+          </p>
         </div>
       </div>
     </footer>

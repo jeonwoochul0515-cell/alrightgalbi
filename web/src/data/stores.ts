@@ -1,4 +1,5 @@
-// 본사 직영 매장(서면·화명·김해외동) 데이터. 가맹점은 StoreLocatorSection의 partnerStores 별도 관리.
+// 매장 기본값(seed). 직영·가맹은 isDirect 로 구분한다.
+// 운영 중 수정은 /admin → 매장 에서 하며, 그 값이 이 파일 대신 사용된다.
 import type { Store } from "../types/domain";
 
 export const stores: Store[] = [
@@ -191,11 +192,3 @@ export const stores: Store[] = [
     tags: ["대구", "계명대", "달서구", "가맹"],
   },
 ];
-
-export const directStores = stores.filter((s) => s.isDirect);
-export const partnerStores = stores.filter((s) => !s.isDirect);
-
-export const getStoreBySlug = (slug: string): Store | undefined =>
-  stores.find((s) => s.id === slug);
-
-export const flagshipStore = stores.find((s) => s.isFlagship)!;

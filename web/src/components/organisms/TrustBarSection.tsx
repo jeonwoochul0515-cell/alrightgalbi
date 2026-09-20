@@ -1,12 +1,13 @@
 import { Reveal } from "../atoms/Reveal";
 import { TrustBadge } from "../molecules/TrustBadge";
-import { authorityBadges, safetyBadges } from "../../data/trustBadges";
+import { useContent } from "../../content/context";
 
 interface Props {
   variant?: "authority" | "safety";
 }
 
 export function TrustBarSection({ variant = "authority" }: Props) {
+  const { authorityBadges, safetyBadges } = useContent();
   const badges = variant === "authority" ? authorityBadges : safetyBadges;
   return (
     <div className="bg-[var(--color-charcoal-950)] border-y border-[var(--color-border)]">

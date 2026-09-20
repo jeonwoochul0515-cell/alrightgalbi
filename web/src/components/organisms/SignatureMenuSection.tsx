@@ -3,9 +3,10 @@ import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
 import { Button } from "../atoms/Button";
 import { MenuCard } from "../molecules/MenuCard";
-import { signatureMenu, tableCharge } from "../../data/menu";
+import { useContent } from "../../content/context";
 
 export function SignatureMenuSection() {
+  const { signatureMenu, tableCharge } = useContent();
   const handleScrollToStores = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     const el = document.querySelector("#stores");

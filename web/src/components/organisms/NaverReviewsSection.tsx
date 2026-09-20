@@ -2,7 +2,7 @@
 import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
-import { stores } from "../../data/stores";
+import { useContent } from "../../content/context";
 import type { Store } from "../../types/domain";
 
 const NAVER_SEARCH_BASE = "https://map.naver.com/p/search/";
@@ -64,6 +64,7 @@ function StoreReviewCard({ store }: { store: Store }) {
 }
 
 export function NaverReviewsSection() {
+  const { stores } = useContent();
   return (
     <Section id="reviews" spacing="lg" bg="elev">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 md:mb-12">

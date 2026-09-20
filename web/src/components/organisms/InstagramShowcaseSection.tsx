@@ -2,7 +2,7 @@
 import { Section } from "../atoms/Section";
 import { Heading } from "../atoms/Heading";
 import { Reveal } from "../atoms/Reveal";
-import { instagramPosts, instagramHashtagUrl } from "../../data/instagram";
+import { useContent } from "../../content/context";
 import type { InstagramPost } from "../../types/domain";
 
 function KindBadge({ kind }: { kind: InstagramPost["kind"] }) {
@@ -84,6 +84,7 @@ function InstagramCard({ post }: { post: InstagramPost }) {
 }
 
 export function InstagramShowcaseSection() {
+  const { instagramPosts, instagramHashtagUrl } = useContent();
   return (
     <Section id="instagram" spacing="lg" bg="default">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10 md:mb-12">

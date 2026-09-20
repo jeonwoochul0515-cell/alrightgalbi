@@ -43,8 +43,6 @@ export const safetyBadges: TrustBadgeData[] = [
   },
 ];
 
-export const allBadges: TrustBadgeData[] = [...authorityBadges, ...safetyBadges];
-
 // 사회적 증거 mosaic
 export const socialProofItems: SocialProofItem[] = [
   {

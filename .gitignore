@@ -49,3 +49,9 @@ info_utf8.txt
 /*.jpg
 /*.png
 !/web/**
+
+# 위 !/web/** 가 앞서 선언한 .env 차단을 무효화한다. 자격증명은 맨 마지막에 다시 막는다.
+web/.env
+web/.env.local
+web/.env.*.local
+functions/.env

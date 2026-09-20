@@ -145,14 +145,6 @@ export const franchiseCosts: FranchiseCost[] = [
   },
 ];
 
-export const totalInitialFee = franchiseCosts
-  .filter((c) => c.category === "최초가맹금" && c.unit === "KRW_1000")
-  .reduce((sum, c) => sum + c.amount, 0);
-
-export const totalOtherCost = franchiseCosts
-  .filter((c) => c.category === "기타비용" && c.unit === "KRW_1000")
-  .reduce((sum, c) => sum + c.amount, 0);
-
 export const valueProps: ValueProp[] = [
   {
     id: "deposit-zero",

@@ -43,7 +43,7 @@ export const submitInquiry = onCall({
         const windowStart = now - 60 * 60 * 1000;
         const hits = (snap.data()?.hits ?? []).filter((t) => t > windowStart);
         if (hits.length >= 5) {
-            throw new HttpsError("resource-exhausted", "요청이 너무 많습니다. 잠시 후 다시 시도하거나 010-9342-4929로 직접 연락해 주세요.");
+            throw new HttpsError("resource-exhausted", "요청이 너무 많습니다. 잠시 후 다시 시도하거나 010-5722-4929로 직접 연락해 주세요.");
         }
         hits.push(now);
         tx.set(rlRef, { hits, updatedAt: FieldValue.serverTimestamp() });

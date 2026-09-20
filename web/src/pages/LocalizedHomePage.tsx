@@ -6,8 +6,7 @@ import { Heading } from "../components/atoms/Heading";
 import { Reveal } from "../components/atoms/Reveal";
 import { Wordmark } from "../components/atoms/Wordmark";
 import { Badge } from "../components/atoms/Badge";
-import { directStores, partnerStores } from "../data/stores";
-import { menuItems, tableCharge } from "../data/menu";
+import { useContent } from "../content/context";
 import { translations, type Locale } from "../i18n/translations";
 import type { MenuItem, Store } from "../types/domain";
 
@@ -125,6 +124,7 @@ function StoreCard({ s, locale, copy }: { s: Store; locale: Locale; copy: typeof
 
 export function LocalizedHomePage({ locale }: Props) {
   const copy = translations[locale];
+  const { directStores, partnerStores, menuItems, tableCharge } = useContent();
   const signatureMenu = menuItems.filter((m) => m.badge === "signature" || m.badge === "new");
   const sideMenu = menuItems.filter((m) => m.category === "side" && m.badge !== "new");
   const mealMenu = menuItems.filter((m) => m.category === "meal");

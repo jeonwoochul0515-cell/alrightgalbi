@@ -2,12 +2,30 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // 가맹문의 — 클라이언트 직접 접근 금지
-    // 쓰기는 Functions(Admin SDK)만, 읽기는 admin custom claim 보유자만
-    match /inquiries/{id} {
-      allow read: if request.auth != null
-                  && request.auth.token.admin == true;
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // 사이트 콘텐츠 — 누구나 읽고, 관리자만 쓴다.
+    // 쓰기 권한은 adminLogin Function이 발급한 custom token의 admin 클레임으로만 얻는다.
+    match /site_content/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // 콘텐츠 변경 이력 — 관리자만 읽고, 쓰기는 Functions(Admin SDK) 전용
+    match /site_content_history/{docId} {
+      allow read: if isAdmin();
       allow write: if false;
+    }
+
+    // 가맹문의 — 쓰기는 Functions(Admin SDK)만, 읽기·상태변경은 관리자만
+    match /inquiries/{id} {
+      allow read: if isAdmin();
+      allow update: if isAdmin()
+                    && request.resource.data.diff(resource.data).affectedKeys()
+                         .hasOnly(['status', 'memo', 'updatedAt']);
+      allow create, delete: if false;
     }
 
     // 레이트 리미트 — 클라이언트 접근 완전 차단

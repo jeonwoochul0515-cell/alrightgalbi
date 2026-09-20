@@ -39,6 +39,9 @@ export default defineConfig({
             if (id.includes("react-dom") || id.includes("react/")) return "react-vendor";
             if (id.includes("react-kakao-maps")) return "kakao-map";
             if (id.includes("motion")) return "motion";
+            // auth 는 관리자 화면에서만 쓰이므로 따로 떼어 방문자 번들에서 제외한다.
+            if (id.includes("firebase/auth") || id.includes("@firebase/auth"))
+              return "firebase-auth";
             if (id.includes("firebase")) return "firebase";
           }
         },
