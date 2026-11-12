@@ -10,7 +10,7 @@ import { authorityBadges, safetyBadges, socialProofItems } from "../data/trustBa
 import type { SiteContent, SiteSettings } from "./types";
 
 export const defaultSettings: SiteSettings = {
-  maintenance: true,
+  maintenance: false,
   maintenanceTitle: "홈페이지 리뉴얼 중입니다",
   maintenanceBody:
     "더 나은 모습으로 찾아뵙기 위해 올바로갈비 홈페이지를 새로 단장하고 있습니다. 공사 기간에도 전 매장은 정상 영업합니다.",
